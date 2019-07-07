@@ -1,29 +1,36 @@
 ﻿<!DOCTYPE html>
 <html>
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>RoslynGenerator</title>
-    <base href="/" />
+    <base href="/RoslynGenerator/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Chivo:400,700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.17.1/min/vs/editor/editor.main.css" integrity="sha256-nNAcGtcHP9h/CNeZetYi4ZDAoxdZq4o7pu18LU2t5Tw=" crossorigin="anonymous" />
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.17.1/min/vs/editor/editor.main.css"
+      integrity="sha256-nNAcGtcHP9h/CNeZetYi4ZDAoxdZq4o7pu18LU2t5Tw="
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
     <app>
-        <div class="d-flex justify-content-center align-items-center w-100 vh-100">
-            <div>
-                <p class="loading-animation" id="loadingEmoji"></p>
-                <p class="display-2 font-weight-bolder">LOADING...</p>
-            </div>
+      <div class="d-flex justify-content-center align-items-center w-100 vh-100">
+        <div>
+          <p class="loading-animation" id="loadingEmoji"></p>
+          <p class="display-2 font-weight-bolder">LOADING...</p>
         </div>
+      </div>
     </app>
     <script src="js/site.js"></script>
-    <script>var require = { paths: { 'vs': 'monaco-editor/min/vs' } };</script>
+    <script>
+      var require = { paths: { vs: "monaco-editor/min/vs" } };
+    </script>
     <script src="monaco-editor/min/vs/loader.js"></script>
     <script src="monaco-editor/min/vs/editor/editor.main.nls.js"></script>
     <script src="monaco-editor/min/vs/editor/editor.main.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
-</body>
+  </body>
 </html>
