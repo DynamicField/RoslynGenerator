@@ -22,64 +22,69 @@
 </div>
 
 @code {
-    CancellationTokenSource tokenSource = new CancellationTokenSource();
-    string result = "";
-    readonly ParseType[] choices = (ParseType[])Enum.GetValues(typeof(ParseType));
-    ParseType _selectedType;
-    ParseType SelectedType
+CancellationTokenSource tokenSource = new CancellationTokenSource();
+string result = "";
+readonly ParseType[] choices = (ParseType[])Enum.GetValues(typeof(ParseType));
+ParseType _selectedType;
+ParseType SelectedType
+{
+    get => _selectedType;
+    set
     {
-        get => _selectedType;
-        set
-        {
-            InvalidateChanges();
-            _selectedType = value;
-            _ = RegisterChange(Code, tokenSource.Token);
-        }
+        InvalidateChanges();
+        _selectedType = value;
+        _ = RegisterChange(Code, tokenSource.Token);
     }
-    private string _code = "class MyClass { }";
-    string Code
+}
+private string _code = "class MyClass { }";
+string Code
+{
+    get => _code;
+    set
     {
-        get => _code;
-        set
-        {
-            InvalidateChanges();
-            _code = value;
-            _ = RegisterChange(value, tokenSource.Token);
-        }
+        InvalidateChanges();
+        _code = value;
+        _ = RegisterChange(value, tokenSource.Token);
     }
-    async Task RegisterChange(string requestedCode, CancellationToken cancellationToken)
+}
+async Task RegisterChange(string requestedCode, CancellationToken cancellationToken)
+{
+    await Task.Delay(250);
+    await UpdateSyntaxFactory(cancellationToken);
+}
+async Task UpdateSyntaxFactory(CancellationToken cancellationToken)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    SyntaxNode node = null;
+    switch (SelectedType)
     {
-        await Task.Delay(250);
-        await UpdateSyntaxFactory(cancellationToken);
+        case ParseType.Compilation:
+            node = await SyntaxFactory.ParseSyntaxTree(Code).GetRootAsync(cancellationToken);
+            break;
+        case ParseType.Member:
+            node = SyntaxFactory.ParseMemberDeclaration(Code);
+            break;
+        case ParseType.Expression:
+            node = SyntaxFactory.ParseExpression(Code);
+            break;
+        case ParseType.Statement:
+            node = SyntaxFactory.ParseStatement(Code);
+            break;
+        default:
+            goto case ParseType.Compilation;
     }
-    async Task UpdateSyntaxFactory(CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        SyntaxNode node = null;
-        switch (SelectedType)
-        {
-            case ParseType.Compilation:
-                node = await SyntaxFactory.ParseSyntaxTree(Code).GetRootAsync(cancellationToken);
-                break;
-            case ParseType.Member:
-                node = SyntaxFactory.ParseMemberDeclaration(Code);
-                break;
-            case ParseType.Expression:
-                node = SyntaxFactory.ParseExpression(Code);
-                break;
-            case ParseType.Statement:
-                node = SyntaxFactory.ParseStatement(Code);
-                break;
-            default:
-                goto case ParseType.Compilation;
-        }
-        var syntaxFactoryCode = await Task.Run(() => SyntaxFactoryWriter.Serialize(node), cancellationToken);
-        result = syntaxFactoryCode;
-        StateHasChanged();
-    }
-    private void InvalidateChanges()
-    {
-        tokenSource.Cancel();
-        tokenSource = new CancellationTokenSource();
-    }
+    var syntaxFactoryCode = await Task.Run(() => SyntaxFactoryWriter.Serialize(node), cancellationToken);
+    result = syntaxFactoryCode;
+    StateHasChanged();
+}
+private void InvalidateChanges()
+{
+    tokenSource.Cancel();
+    tokenSource = new CancellationTokenSource();
+}
+protected override async Task OnInitAsync()
+{
+    InvalidateChanges();
+    await UpdateSyntaxFactory(tokenSource.Token);
+}
 }
